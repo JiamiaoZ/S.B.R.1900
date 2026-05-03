@@ -1,3 +1,9 @@
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = 'https://vpgwwkvaqbgozhfuasml.supabase.co'
+const supabaseKey = 'sb_publishable_wmaOdZmOPpQBj1HUgNedvg__We1nEqW'
+export const supabase = createClient(supabaseUrl, supabaseKey)
+
 import { Boot } from './scenes/Boot';
 import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
