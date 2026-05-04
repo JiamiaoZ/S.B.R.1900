@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { supabase } from '../main';
 
 export class MainMenu extends Scene
 {
@@ -43,7 +44,7 @@ export class Login extends Scene {
 
     create() {
         // Place the HTML form in the center of the screen
-        const form = this.add.dom(400, 300).createFromCache('loginform');
+        const form = this.add.dom(512, 384).createFromCache('loginform');
 
         // Listen for the button click inside the HTML
         form.addListener('click');
@@ -61,10 +62,9 @@ export class Login extends Scene {
                     });
 
                     if (data.user) {
-                        this.scene.start('GameScene');
+                        this.scene.start('Game');
                     } else {
-                        //alert("Access Denied: " + error.message);
-                        form.getChildByName('password').value = 'password incorrect';
+                        alert("Access Denied: " + error.message);
                     }
                 }
             }
