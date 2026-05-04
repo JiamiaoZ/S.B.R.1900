@@ -9,6 +9,7 @@ import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
+import { Login } from './scenes/MainMenu';
 import { AUTO, Game, Scale } from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -27,9 +28,14 @@ const config = {
         Boot,
         Preloader,
         MainMenu,
+        Login,
         MainGame,
         GameOver
-    ]
+    ],
+    	parent: 'phaser-container',
+	dom: {
+        createContainer: true
+    },
 };
 
 const StartGame = (parent) => {
