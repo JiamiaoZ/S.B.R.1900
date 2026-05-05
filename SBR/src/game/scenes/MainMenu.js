@@ -23,8 +23,31 @@ export class MainMenu extends Scene {
 
         if (show) {
             this.statBtn.setText("CLOSE STATS");
+            this.fetchPlayerData();
         } else {
             this.statBtn.setText("VIEW STATS");
+        }
+    }
+
+    async fetchPlayerData() {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            console.error("No user logged in!");
+            return;
+        }
+
+        const { data, error } = await supabase
+            .from('PlayerStats')
+            .select('health, food')
+            .eq('id', user.id)
+            .single();
+
+        if (error) {
+            console.error("Error fetching stats:", error.message);
+        } else if (data) {
+            this.healthText.setText(`Health: ${data.health}`);
+            this.foodText.setText(`Food: ${data.food}`);
         }
     }
 
@@ -56,8 +79,8 @@ export class MainMenu extends Scene {
         const box = this.add.rectangle(0, 0, 300, 400, 0x111111).setStrokeStyle(2, 0x00ff00);
         const title = this.add.text(-130, -180, "PLAYER STATUS", { font: 'bold 20px monospace', fill: '#0f0' });
 
-        this.healthText = this.add.text(-130, -120, "Health: 100", { fill: '#fff' });
-        this.foodText = this.add.text(-130, -90, "Food: 50", { fill: '#fff' });
+        this.healthText = this.add.text(-130, -120, "Health: ", { fill: '#fff' });
+        this.foodText = this.add.text(-130, -90, "Food: ", { fill: '#fff' });
 
         // Note: Backdrop is added first so it stays behind the text/box
         this.statWindow.add([backdrop, box, title, this.healthText, this.foodText]);
