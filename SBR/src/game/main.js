@@ -7,9 +7,10 @@ export const supabase = createClient(supabaseUrl, supabaseKey)
 import { Boot } from './scenes/Boot';
 import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
+import { MainScreen } from './scenes/MainScreen';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
-import { Login } from './scenes/MainMenu';
+import { Login } from './scenes/MainScreen';
 import { AUTO, Game, Scale } from 'phaser';
 
 //  Find out more information about the Game Config at:
@@ -27,8 +28,9 @@ const config = {
     scene: [
         Boot,
         Preloader,
-        MainMenu,
+        MainScreen,
         Login,
+        MainMenu,
         MainGame,
         GameOver
     ],
