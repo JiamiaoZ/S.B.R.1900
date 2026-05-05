@@ -39,7 +39,7 @@ export class MainMenu extends Scene {
 
         const { data, error } = await supabase
             .from('PlayerStats')
-            .select('health, food')
+            .select('char_name, health, food, strength, intelligence, luck, power, speed, range, stamina, precision, potential, hours')
             .eq('id', user.id)
             .single();
 
@@ -48,6 +48,16 @@ export class MainMenu extends Scene {
         } else if (data) {
             this.healthText.setText(`Health: ${data.health}`);
             this.foodText.setText(`Food: ${data.food}`);
+            this.strengthText.setText(`Strength: ${data.strength}`);
+            this.intelligenceText.setText(`Intelligence: ${data.intelligence}`);
+            this.luckText.setText(`Luck: ${data.luck}`);
+            this.powerText.setText(`Power: ${data.power}`);
+            this.speedText.setText(`Speed: ${data.speed}`);
+            this.rangeText.setText(`Range: ${data.range}`);
+            this.staminaText.setText(`Stamina: ${data.stamina}`);
+            this.precisionText.setText(`Precision: ${data.precision}`);
+            this.potentialText.setText(`Potential: ${data.potential}`);
+            this.hoursText.setText(`Hours: ${data.hours}`);
         }
     }
 
@@ -76,14 +86,26 @@ export class MainMenu extends Scene {
             .setInteractive()
             .on('pointerdown', () => this.toggleStats(false));
 
-        const box = this.add.rectangle(0, 0, 300, 400, 0x111111).setStrokeStyle(2, 0x00ff00);
-        const title = this.add.text(-130, -180, "PLAYER STATUS", { font: 'bold 20px monospace', fill: '#0f0' });
+        const box = this.add.rectangle(0, 0, 300, 500, 0x111111).setStrokeStyle(2, 0x00ff00);
+        const title = this.add.text(-120, -200, "PLAYER STATUS", { font: 'bold 20px monospace', fill: '#0f0' });
 
-        this.healthText = this.add.text(-130, -120, "Health: ", { fill: '#fff' });
-        this.foodText = this.add.text(-130, -90, "Food: ", { fill: '#fff' });
+        this.healthText = this.add.text(-130, -140, "Health: ", { fill: '#fff' });
+        this.foodText = this.add.text(-130, -110, "Food: ", { fill: '#fff' });
+        this.strengthText = this.add.text(-130, -90, "Strength: ", { fill: '#fff' });
+        this.intelligenceText = this.add.text(-130, -60, "Intelligence: ", { fill: '#fff' });
+        this.luckText = this.add.text(-130, -30, "Luck: ", { fill: '#fff' });
+        this.powerText = this.add.text(-130, 0, "Power: ", { fill: '#fff' });
+        this.speedText = this.add.text(-130, 30, "Speed: ", { fill: '#fff' });
+        this.rangeText = this.add.text(-130, 60, "Range: ", { fill: '#fff' });
+        this.staminaText = this.add.text(-130, 90, "Stamina: ", { fill: '#fff' });
+        this.precisionText = this.add.text(-130, 120, "Precision: ", { fill: '#fff' });
+        this.potentialText = this.add.text(-130, 150, "Potential: ", { fill: '#fff' });
+        this.hoursText = this.add.text(-130, 180, "Hours: ", { fill: '#fff' });
 
         // Note: Backdrop is added first so it stays behind the text/box
-        this.statWindow.add([backdrop, box, title, this.healthText, this.foodText]);
+        this.statWindow.add([backdrop, box, title, this.healthText, this.foodText, this.strengthText, 
+            this.intelligenceText, this.luckText, this.powerText, this.speedText, this.rangeText, 
+            this.staminaText, this.precisionText, this.potentialText,	this.hoursText]);
     }
 
 }
