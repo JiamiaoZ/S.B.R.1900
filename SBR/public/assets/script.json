@@ -8,5 +8,11 @@
         { "label": "Go Right", "next": "stage_1_right" }
       ] 
     }
+  ],
+  "stage_1_left": [
+    { "bg": "background", "char": "character", "text": "You took the left path. It's quiet here." }
+  ],
+  "stage_1_right": [
+    { "bg": "background", "char": "character", "text": "You took the right path. You hear strange noises." }
   ]
 }

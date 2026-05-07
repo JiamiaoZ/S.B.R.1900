@@ -29,13 +29,14 @@ export class Pregame extends Scene {
 
         this.choiceContainer = this.add.container(512, 300).setVisible(false);
 
-        this.add.rectangle(512, 384, 1024, 768)
+        this.fullScreenRect = this.add.rectangle(512, 384, 1024, 768)
             .setInteractive()
             .on('pointerdown', () => {
                 if (!this.isTyping && !this.choiceContainer.visible) {
                     this.nextLine();
                 }
             });
+
 
         this.nextLine();
     }
@@ -70,7 +71,15 @@ export class Pregame extends Scene {
     typewriteText(label, message) {
         this.isTyping = true;
         label.setText(''); 
-        
+
+        this.fullScreenRect.once('pointerdown', () => {
+            if (this.isTyping) {
+                this.typingTimer.remove();
+                label.setText(message);
+                this.isTyping = false;
+            }
+        });
+
         let charIndex = 0;
         this.typingTimer = this.time.addEvent({
             delay: 40, 
@@ -89,6 +98,10 @@ export class Pregame extends Scene {
         this.choiceContainer.removeAll(true);
         this.choiceContainer.setVisible(true);
 
+        this.choiceContainer.removeAll(true);
+        this.choiceContainer.setVisible(true);
+        this.fullScreenRect.disableInteractive();
+
         choices.forEach((choice, i) => {
             const btn = this.add.text(0, i * 60, choice.label, {
                 backgroundColor: '#222',
@@ -98,10 +111,13 @@ export class Pregame extends Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
+
                 this.choiceContainer.setVisible(false);
+                this.fullScreenRect.setInteractive();
+
                 // Optionally jump to a new script branch here
-                // this.currentSceneData = this.fullStory[choice.next];
-                // this.lineIndex = 0;
+                this.currentSceneData = this.fullStory[choice.next];
+                this.lineIndex = 0;
                 this.nextLine();
             });
             this.choiceContainer.add(btn);
