@@ -28,15 +28,28 @@ export class Pregame extends Scene {
         dialogue_container.add([dialogue_box, this.dialogText]);
 
         this.choiceContainer = this.add.container(512, 300).setVisible(false);
+        this.currentChoices = null;
+        this.choicesShown = false;
+        this.currentTypingLabel = null;
+        this.currentTypingMessage = null;
+        this.currentTypingComplete = null;
 
         this.fullScreenRect = this.add.rectangle(512, 384, 1024, 768)
             .setInteractive()
             .on('pointerdown', () => {
-                if (!this.isTyping && !this.choiceContainer.visible) {
-                    this.nextLine();
+                if (this.isTyping) {
+                    this.fastForwardTyping();
+                    return;
+                }
+
+                if (!this.choiceContainer.visible) {
+                    if (this.currentChoices && !this.choicesShown) {
+                        this.showChoices(this.currentChoices);
+                    } else {
+                        this.nextLine();
+                    }
                 }
             });
-
 
         this.nextLine();
     }
@@ -53,13 +66,13 @@ export class Pregame extends Scene {
                 this.tweens.add({ targets: this.characterSprite, x: 750, alpha: 1, duration: 500 });
             }
 
-            this.typewriteText(this.dialogText, line.text);
-
-            if (line.choices) {
-                this.time.delayedCall(line.text.length * 40, () => {
-                    this.showChoices(line.choices);
-                });
-            }
+            this.currentChoices = line.choices || null;
+            this.choicesShown = false;
+            this.typewriteText(this.dialogText, line.text, () => {
+                if (this.currentChoices && !this.choicesShown) {
+                    this.showChoices(this.currentChoices);
+                }
+            });
 
             this.lineIndex++;
         } else {
@@ -68,39 +81,62 @@ export class Pregame extends Scene {
         }
     }
 
-    typewriteText(label, message) {
+    typewriteText(label, message, onComplete) {
         this.isTyping = true;
-        label.setText(''); 
-
-        this.fullScreenRect.once('pointerdown', () => {
-            if (this.isTyping) {
-                this.typingTimer.remove();
-                label.setText(message);
-                this.isTyping = false;
-            }
-        });
+        label.setText('');
+        this.currentTypingLabel = label;
+        this.currentTypingMessage = message;
+        this.currentTypingComplete = onComplete;
 
         let charIndex = 0;
         this.typingTimer = this.time.addEvent({
-            delay: 40, 
+            delay: 40,
             repeat: message.length - 1,
             callback: () => {
                 label.text += message[charIndex];
                 charIndex++;
                 if (charIndex === message.length) {
                     this.isTyping = false;
+                    if (this.currentTypingComplete) {
+                        this.currentTypingComplete();
+                        this.currentTypingComplete = null;
+                    }
                 }
             }
         });
     }
 
+    fastForwardTyping() {
+        if (!this.isTyping || !this.typingTimer) {
+            return;
+        }
+
+        this.typingTimer.remove();
+        this.currentTypingLabel.setText(this.currentTypingMessage);
+        this.isTyping = false;
+
+        if (this.currentTypingComplete) {
+            this.currentTypingComplete();
+            this.currentTypingComplete = null;
+        }
+
+        this.currentTypingLabel = null;
+        this.currentTypingMessage = null;
+    }
+
     showChoices(choices) {
         this.choiceContainer.removeAll(true);
         this.choiceContainer.setVisible(true);
-
-        this.choiceContainer.removeAll(true);
-        this.choiceContainer.setVisible(true);
+        this.choiceContainer.setDepth(1);
         this.fullScreenRect.disableInteractive();
+        this.choicesShown = true;
+        this.currentChoices = null;
+        this.currentTypingLabel = null;
+        this.currentTypingMessage = null;
+        this.currentTypingComplete = null;
+        this.currentTypingLabel = null;
+        this.currentTypingMessage = null;
+        this.currentTypingComplete = null;
 
         choices.forEach((choice, i) => {
             const btn = this.add.text(0, i * 60, choice.label, {
@@ -111,7 +147,6 @@ export class Pregame extends Scene {
             .setOrigin(0.5)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-
                 this.choiceContainer.setVisible(false);
                 this.fullScreenRect.setInteractive();
 
