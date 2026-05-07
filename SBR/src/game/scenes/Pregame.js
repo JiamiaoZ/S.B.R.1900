@@ -9,21 +9,16 @@ export class Pregame extends Scene {
         this.isTyping = false;
         this.lineIndex = 0;
 
-        // 1. Load Data
         this.fullStory = this.cache.json.get('script');
         this.currentSceneData = this.fullStory.stage_1_intro;
 
-        // 2. Add Background FIRST
         this.bgImage = this.add.image(512, 384, 'background');
 
-        // 3. Add Character (Assigned to this.characterSprite)
         this.characterSprite = this.add.sprite(750, 484, 'character').setScale(2);
 
-        // 4. Dialogue UI
         const dialogue_container = this.add.container(512, 384);
         const dialogue_box = this.add.rectangle(0, 250, 900, 200, 0x000000, 0.8).setStrokeStyle(2, 0xffffff);
         
-        // Define text and add it TO the container so it stays with the box
         this.dialogText = this.add.text(-430, 180, '', { 
             font: '24px Arial', 
             fill: '#ffffff', 
@@ -32,11 +27,8 @@ export class Pregame extends Scene {
 
         dialogue_container.add([dialogue_box, this.dialogText]);
 
-        // 5. Choice Container
         this.choiceContainer = this.add.container(512, 300).setVisible(false);
 
-        // 6. Global Click Listener
-        // We create an invisible zone covering the screen to detect clicks
         this.add.rectangle(512, 384, 1024, 768)
             .setInteractive()
             .on('pointerdown', () => {
@@ -45,7 +37,6 @@ export class Pregame extends Scene {
                 }
             });
 
-        // Start the first line immediately
         this.nextLine();
     }
 
@@ -53,11 +44,9 @@ export class Pregame extends Scene {
         if (this.lineIndex < this.currentSceneData.length) {
             const line = this.currentSceneData[this.lineIndex];
             
-            // Fix: Use correct variable names
             if (line.char) this.characterSprite.setTexture(line.char);
             if (line.bg) this.bgImage.setTexture(line.bg);
 
-            // Trigger animations if they exist
             if (line.anim === 'slide-in') {
                 this.characterSprite.setAlpha(0).setX(1000); // Start off-screen right
                 this.tweens.add({ targets: this.characterSprite, x: 750, alpha: 1, duration: 500 });
@@ -65,9 +54,7 @@ export class Pregame extends Scene {
 
             this.typewriteText(this.dialogText, line.text);
 
-            // Handle Choices
             if (line.choices) {
-                // We'll show choices AFTER typing finishes
                 this.time.delayedCall(line.text.length * 40, () => {
                     this.showChoices(line.choices);
                 });
@@ -76,7 +63,7 @@ export class Pregame extends Scene {
             this.lineIndex++;
         } else {
             console.log("End of this story segment!");
-            this.scene.start('MainGame'); // Or wherever is next
+            this.scene.start('MainGame');
         }
     }
 

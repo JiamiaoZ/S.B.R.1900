@@ -1,6 +1,8 @@
 {
   "stage_1_intro": [
-    { "bg": "bg", "char": "character", "anim": "slide-in", "text": "Welcome, traveler. Choose your path.", 
+    { "bg": "background", "char": "character", "anim": "slide-in", "text": "Welcome, traveler. Your journey begins here."
+    },
+    { "bg": "background", "char": "character", "text": "Choose your path.", 
       "choices": [
         { "label": "Go Left", "next": "stage_1_left" },
         { "label": "Go Right", "next": "stage_1_right" }
