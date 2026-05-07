@@ -9,6 +9,7 @@ import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainScreen } from './scenes/MainScreen';
 import { MainMenu } from './scenes/MainMenu';
+import { Pregame } from './scenes/Pregame';
 import { Preloader } from './scenes/Preloader';
 import { Login } from './scenes/MainScreen';
 import { AUTO, Game, Scale } from 'phaser';
@@ -31,6 +32,7 @@ const config = {
         MainScreen,
         Login,
         MainMenu,
+        Pregame,
         MainGame,
         GameOver
     ],

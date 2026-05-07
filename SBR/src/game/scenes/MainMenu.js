@@ -6,6 +6,11 @@ import { supabase } from '../main';
 function MakeStageText(scene, stageNumber, x, y) {
     const container = scene.add.container(x, y);
     const circle = scene.add.circle(0, 0, 60, 0x000000);
+    circle.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+        if (stageNumber === 0) {
+            scene.scene.start('Pregame', { stage: stageNumber, status: 'pregame'});
+        }
+    });
     const text = scene.add.text(0, 0, `STAGE ${stageNumber}`, { fontSize: '22px', fill: 'rgb(255, 0, 0)' });
     text.setOrigin(0.5, 0.5);
     container.add([circle, text]);

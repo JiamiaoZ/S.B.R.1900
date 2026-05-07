@@ -33,6 +33,8 @@ export class Preloader extends Scene
         this.load.setPath('assets');
 
         this.load.image('logo', 'logo.png');
+
+        this.load.image('character', 'character.png');
     }
 
     create ()
@@ -43,6 +45,6 @@ export class Preloader extends Scene
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         //this.scene.start('MainScreen');
 
-        this.scene.start('MainMenu'); //debug purposes
+        this.scene.start('Pregame'); //debug purposes
     }
 }
