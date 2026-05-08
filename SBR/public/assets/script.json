@@ -10,7 +10,19 @@
     }
   ],
   "stage_1_left": [
-    { "bg": "background", "char": "character", "text": "You took the left path. It's quiet here." }
+    { "bg": "background", "char": "character", "text": "You took the left path. It's quiet here." },
+    { "bg": "background", "char": "character", "text": "Buy food?",
+      "choices": [
+        { "label": "Yes", "db": { "food": 1 }, "next": "stage_1_left_food" },
+        { "label": "No", "next": "stage_1_left_no_food" }
+      ]
+    }
+  ],
+  "stage_1_left_food": [
+    { "bg": "background", "char": "character", "text": "You bought some food. It might come in handy later." }
+  ],
+  "stage_1_left_no_food": [
+    { "bg": "background", "char": "character", "text": "You decided not to buy food. You might regret this later." }
   ],
   "stage_1_right": [
     { "bg": "background", "char": "character", "text": "You took the right path. You hear strange noises." }
