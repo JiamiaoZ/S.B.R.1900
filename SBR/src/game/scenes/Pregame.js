@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { DialogueManager } from '../systems/DialogueManager';
 import { supabase } from '../main'
 
 export class Pregame extends Scene {
@@ -19,10 +20,6 @@ export class Pregame extends Scene {
         // Remove loading text and start the game logic
         loadingText.destroy();
 
-
-        this.isTyping = false;
-        this.lineIndex = 0;
-
         this.fullStory = this.cache.json.get('script');
         this.currentSceneData = this.fullStory.stage_1_intro;
 
@@ -42,137 +39,45 @@ export class Pregame extends Scene {
         dialogue_container.add([dialogue_box, this.dialogText]);
 
         this.choiceContainer = this.add.container(512, 300).setVisible(false);
-        this.currentChoices = null;
-        this.choicesShown = false;
-        this.currentTypingLabel = null;
-        this.currentTypingMessage = null;
-        this.currentTypingComplete = null;
 
         this.fullScreenRect = this.add.rectangle(512, 384, 1024, 768)
             .setInteractive()
             .on('pointerdown', () => {
-                if (this.isTyping) {
-                    this.fastForwardTyping();
+                if (this.dialogueManager.isTyping) {
+                    this.dialogueManager.fastForwardTyping();
                     return;
                 }
 
                 if (!this.choiceContainer.visible) {
-                    if (this.currentChoices && !this.choicesShown) {
-                        this.showChoices(this.currentChoices);
+                    if (this.dialogueManager.currentChoices && !this.dialogueManager.choicesShown) {
+                        this.dialogueManager.showChoices(this.dialogueManager.currentChoices);
                     } else {
-                        this.nextLine();
+                        this.dialogueManager.nextLine();
                     }
                 }
             });
 
-        this.nextLine();
-    }
-
-    nextLine() {
-        if (this.lineIndex < this.currentSceneData.length) {
-            const line = this.currentSceneData[this.lineIndex];
-            
-            if (line.char) this.characterSprite.setTexture(line.char);
-            if (line.bg) this.bgImage.setTexture(line.bg);
-
-            if (line.anim === 'slide-in') {
-                this.characterSprite.setAlpha(0).setX(1000); // Start off-screen right
-                this.tweens.add({ targets: this.characterSprite, x: 750, alpha: 1, duration: 500 });
-            }
-
-            this.currentChoices = line.choices || null;
-            this.choicesShown = false;
-            this.typewriteText(this.dialogText, line.text, () => {
-                if (this.currentChoices && !this.choicesShown) {
-                    this.showChoices(this.currentChoices);
-                }
-            });
-
-            this.lineIndex++;
-        } else {
-            console.log("End of this story segment!");
-            this.scene.start('Game');
-        }
-    }
-
-    typewriteText(label, message, onComplete) {
-        this.isTyping = true;
-        label.setText('');
-        this.currentTypingLabel = label;
-        this.currentTypingMessage = message;
-        this.currentTypingComplete = onComplete;
-
-        let charIndex = 0;
-        this.typingTimer = this.time.addEvent({
-            delay: 40,
-            repeat: message.length - 1,
-            callback: () => {
-                label.text += message[charIndex];
-                charIndex++;
-                if (charIndex === message.length) {
-                    this.isTyping = false;
-                    if (this.currentTypingComplete) {
-                        this.currentTypingComplete();
-                        this.currentTypingComplete = null;
-                    }
-                }
-            }
+        // Initialize the DialogueManager
+        this.dialogueManager = new DialogueManager(this);
+        this.dialogueManager.init({
+            currentSceneData: this.currentSceneData,
+            dialogText: this.dialogText,
+            characterSprite: this.characterSprite,
+            bgImage: this.bgImage,
+            choiceContainer: this.choiceContainer,
+            fullScreenRect: this.fullScreenRect,
+            fullStory: this.fullStory,
+            onChoiceSelected: (choice) => this.handleChoiceSelected(choice)
         });
+
+        this.dialogueManager.nextLine();
     }
 
-    fastForwardTyping() {
-        if (!this.isTyping || !this.typingTimer) {
-            return;
+    async handleChoiceSelected(choice) {
+        if (choice.db) {
+            console.log("Updating stats with:", choice.db);
+            await this.updatePlayerStats(choice.db);
         }
-
-        this.typingTimer.remove();
-        this.currentTypingLabel.setText(this.currentTypingMessage);
-        this.isTyping = false;
-
-        if (this.currentTypingComplete) {
-            this.currentTypingComplete();
-            this.currentTypingComplete = null;
-        }
-
-        this.currentTypingLabel = null;
-        this.currentTypingMessage = null;
-    }
-
-    showChoices(choices) {
-        this.choiceContainer.removeAll(true);
-        this.choiceContainer.setVisible(true);
-        this.choiceContainer.setDepth(1);
-        this.fullScreenRect.disableInteractive();
-        this.choicesShown = true;
-        this.currentChoices = null;
-        this.currentTypingLabel = null;
-        this.currentTypingMessage = null;
-        this.currentTypingComplete = null;
-
-        choices.forEach((choice, i) => {
-            const btn = this.add.text(0, i * 60, choice.label, {
-                backgroundColor: '#222',
-                padding: { x: 20, y: 10 },
-                fixedWidth: 300
-            })
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .on('pointerdown', async () => {
-                this.choiceContainer.setVisible(false);
-                this.fullScreenRect.setInteractive();
-
-                if (choice.db) {
-                    console.log("Updating stats with:", choice.db);
-                    await this.updatePlayerStats(choice.db);
-                }
-
-                // Optionally jump to a new script branch here
-                this.currentSceneData = this.fullStory[choice.next];
-                this.lineIndex = 0;
-                this.nextLine();
-            });
-            this.choiceContainer.add(btn);
-        });
     }
 
     async updatePlayerStats(modifiers) {

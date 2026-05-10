@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { DialogueManager } from '../systems/DialogueManager';
 import { supabase } from '../main'
 
 export class Game extends Scene
@@ -23,14 +24,17 @@ export class Game extends Scene
         this.diceContainer = this.add.container(-420, 200);
         this.dice1 = this.add.rectangle(0, 0, 80, 80, 0xffffff).setStrokeStyle(2, 0x000000);
         this.dice2 = this.add.rectangle(0, 100, 80, 80, 0xffffff).setStrokeStyle(2, 0x000000);
-        this.diceContainer.add([this.dice1, this.dice2]).addListener('pointerdown', () => {
+        this.diceContainer.add([this.dice1, this.dice2]).setInteractive({ useHandCursor: true }).on('pointerdown', () => {
             const result1 = this.RollDice();
             const result2 = this.RollDice();
-            sum = result1 + result2;
+            this.sum = result1 + result2;
             console.log(`Rolled: ${result1} and ${result2}`);
         });
 
         this.UIcontainer.add(this.rect);
         this.UIcontainer.add(this.diceContainer);
+
+        // Initialize DialogueManager if you need dialogue in the game scene
+        this.dialogueManager = new DialogueManager(this);
     }
 }

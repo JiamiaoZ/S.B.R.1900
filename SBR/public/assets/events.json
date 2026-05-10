@@ -1,0 +1,10 @@
+{
+    "stage_1": {
+        "start": [
+            { "text": "Welcome to the first stage of the game. Click the dice to roll." }
+        ],
+        "1": [
+            { "text": "You rolled a 1. You move 1 space forward." }
+        ]
+    }
+}
