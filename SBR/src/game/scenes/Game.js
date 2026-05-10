@@ -15,7 +15,7 @@ export class Game extends Scene
 
     create ()
     {
-        sum = 0;
+        this.sum = 0;
 
         this.UIcontainer = this.add.container(512, 384);
         this.rect = this.add.rectangle(0, 250, 1024, 300, 0x000000).setAlpha(0.5);
