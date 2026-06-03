@@ -1,7 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://vpgwwkvaqbgozhfuasml.supabase.co'
-const supabaseKey = 'sb_publishable_wmaOdZmOPpQBj1HUgNedvg__We1nEqW'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+
+if (!supabaseUrl || !supabaseKey) {
+    console.error('Supabase environment variables not set. See .env.example');
+}
+
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 import { Boot } from './scenes/Boot';
