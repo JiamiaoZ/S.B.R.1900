@@ -8,16 +8,12 @@ export class Pregame extends Scene {
     }
 
     async create() {
-        // Initialize playerStats with defaults in case fetch fails
         this.playerStats = { food: 0, health: 0 };
 
-        // Show a "Loading..." text if you want
         const loadingText = this.add.text(512, 384, 'Loading Data...', { fill: '#fff' }).setOrigin(0.5);
 
-        // Wait for the data to arrive
         await this.fetchPlayerData();
 
-        // Remove loading text and start the game logic
         loadingText.destroy();
 
         this.fullStory = this.cache.json.get('script');
@@ -74,12 +70,25 @@ export class Pregame extends Scene {
     }
 
     async handleChoiceSelected(choice) {
-        if (choice.db) {
-            console.log("Updating stats with:", choice.db);
-            await this.updatePlayerStats(choice.db);
+        if (choice.server_trigger_id) {
+            console.log("Updating stats with:", choice.server_trigger_id);
+            await this.updatePlayerStats(choice);
         }
     }
 
+    async updatePlayerStats(choice) {
+        const { data, error } = await supabase.rpc('handle_trade', { 
+            choice_id: choice.server_trigger_id 
+        });
+
+        if (error) {
+            console.error("Cheating detected or server error:", error);
+        } else {
+            this.fetchPlayerData();
+        }
+    }
+
+    /*
     async updatePlayerStats(modifiers) {
         // 1. Apply changes locally (e.g., if modifiers is {food: 1}, it adds 1)
         for (let key in modifiers) {
@@ -129,9 +138,9 @@ export class Pregame extends Scene {
             console.log("Row after update:", refreshedRow);
         }
     }
+        */
 
     async fetchPlayerData() {
-        // 1. Get the authenticated user's ID
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
@@ -139,18 +148,15 @@ export class Pregame extends Scene {
             return;
         }
 
-        // 2. Fetch the specific row from your 'PlayerStats' table
         const { data, error } = await supabase
-            .from('PlayerStats')        // Your table name
-            .select('health, food')    // The columns you want (or '*' for all)
-            .eq('id', user.id)       // Filter where the ID matches
-            .single();               // We only expect one row back
+            .from('PlayerStats')
+            .select('health, food')
+            .eq('id', user.id)
+            .single();
 
         if (error) {
             console.error("Error fetching stats:", error.message);
-            // Keep default values initialized in create()
         } else if (data) {
-            // 3. Save it to your scene variable
             this.playerStats = data;
             console.log("Stats loaded:", this.playerStats);
         }

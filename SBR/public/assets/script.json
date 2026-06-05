@@ -13,7 +13,7 @@
     { "bg": "background", "char": "character", "text": "You took the left path. It's quiet here." },
     { "bg": "background", "char": "character", "text": "Buy food?",
       "choices": [
-        { "label": "Yes", "db": { "food": 1 }, "next": "stage_1_left_food" },
+        { "label": "Yes", "server_trigger_id": "buy_food_stage_1", "next": "stage_1_left_food" },
         { "label": "No", "next": "stage_1_left_no_food" }
       ]
     }
