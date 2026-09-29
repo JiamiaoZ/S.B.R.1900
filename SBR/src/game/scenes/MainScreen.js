@@ -2,7 +2,7 @@ import { Scene } from 'phaser';
 import { supabase } from '../main';
 
 export class MainScreen extends Scene
-{
+{   
     constructor ()
     {
         super('MainScreen');
@@ -10,22 +10,53 @@ export class MainScreen extends Scene
 
     create ()
     {
-        this.add.image(512, 384, 'background');
+        this.add.image(512, 384, 'background').setDisplaySize(1024, 768);
 
-        this.add.image(512, 300, 'logo');
+        const logo = this.add.image(512, 384, 'logo').setScale(0.3);
 
-        this.add.text(512, 460, 'Click to Start', {
-            fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
-            stroke: '#000000', strokeThickness: 8,
-            align: 'center'
-        }).setOrigin(0.5);
+        const drought = this.add.image(2000, 384, 'drought').setScale(1).setBelow(logo);
+        
+        let active = false;
 
-        this.input.once('pointerdown', () => {
+        this.input.on('pointerdown', () => {
 
-            if (this.scene.isActive('Login')) {
-                this.scene.stop('Login');
+            if (active) {
+                this.tweens.add({
+                    targets: logo,
+                    x: 512,
+                    y: 384,
+                    scale: 0.3,
+                    duration: 1000,
+                    ease: 'Power2'
+                })
+                this.tweens.add({
+                    targets: this.scene.get('Login').children.list[0],
+                    x: 1500,
+                    duration: 1000,
+                    ease: 'Power2'
+                })
+                this.tweens.add({
+                    targets: drought,
+                    x: 2000,
+                    duration: 1000,
+                    ease: 'Power2'
+                })
+                active = false;
             } else {
+                this.tweens.add({
+                    targets: logo,
+                    x: 250,
+                    duration: 1000,
+                    ease: 'Power2'
+                })
+                this.tweens.add({
+                    targets: drought,
+                    x: 1500,
+                    duration: 1000,
+                    ease: 'Power2'
+                })
                 this.scene.launch('Login');
+                active = true;
             }
 
         });
@@ -43,7 +74,14 @@ export class Login extends Scene {
 
     create() {
         // Place the HTML form in the center of the screen
-        const form = this.add.dom(512, 384).createFromCache('loginform');
+        const form = this.add.dom(1500, 384).createFromCache('loginform');
+
+        this.tweens.add({
+            targets: form,
+            x: 700,
+            duration: 1000,
+            ease: 'Power2'
+        });
 
         // Listen for the button click inside the HTML
         form.addListener('click');

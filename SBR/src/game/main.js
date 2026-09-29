@@ -25,6 +25,8 @@ const config = {
     type: AUTO,
     width: 1024,
     height: 768,
+    pixelArt: false,
+    antialias: true,
     parent: 'game-container',
     backgroundColor: '#028af8',
     scale: {

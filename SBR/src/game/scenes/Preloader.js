@@ -34,9 +34,15 @@ export class Preloader extends Scene
 
         this.load.image('logo', 'logo.png');
 
+        this.load.image('drought', 'drought.jpg');
+
         this.load.image('character', 'character.png');
 
         this.load.json('script', 'script.json');
+
+        this.load.font('retrocash', 'retrocash/Retrocash.ttf');
+
+        this.load.image('paper', 'paper.jpg');
     }
 
     create ()
